@@ -1,0 +1,198 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Clientes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: "Segoe UI", sans-serif;
+            color: #23332d;
+            background: #f3f6f2;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        #contenedora {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            margin: 0;
+            color: #173d32;
+            font-size: 30px;
+            font-weight: 650;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            border: 1px solid #dce5de;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 8px 24px rgb(34 61 48 / 7%);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th,
+        td {
+            padding: 15px 16px;
+            border-bottom: 1px solid #e8eee9;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #eaf1eb;
+            color: #365447;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        tbody tr:hover {
+            background: #f7faf7;
+        }
+
+        .actions {
+            display: flex;
+            gap: 7px;
+        }
+
+        form {
+            margin: 0;
+        }
+
+        input[type="submit"] {
+            min-height: 36px;
+            padding: 7px 11px;
+            border: 1px solid #c9d8cd;
+            border-radius: 5px;
+            background: #fff;
+            color: #28523f;
+            cursor: pointer;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        input[type="submit"]:hover {
+            background: #edf5ef;
+        }
+
+        .create-button input[type="submit"] {
+            padding: 9px 16px;
+            border-color: #1d684d;
+            background: #1d684d;
+            color: #fff;
+        }
+
+        .create-button input[type="submit"]:hover {
+            background: #15563e;
+        }
+
+        .delete-button input[type="submit"] {
+            border-color: #ecd2cf;
+            color: #a13d34;
+        }
+
+        .delete-button input[type="submit"]:hover {
+            background: #fff2f0;
+        }
+
+        @media (max-width: 680px) {
+            body {
+                padding: 26px 14px;
+            }
+
+            .page-header {
+                align-items: flex-start;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            th,
+            td {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main id="contenedora">
+        <header class="page-header">
+            <h1>Clientes</h1>
+            <form action="/clientes/crear" class="create-button">
+                <input type="submit" value="+ Crear cliente">
+            </form>
+        </header>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Nombre</th>
+                        <th>Apellido 1</th>
+                        <th>Apellido 2</th>
+                        <th>Ciudad</th>
+                        <th>Categoría</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="cliente : ${listaClientes}">
+                        <td th:text="${cliente.id}">id</td>
+                        <td th:text="${cliente.nombre}">nombre</td>
+                        <td th:text="${cliente.apellido1}">apellido1</td>
+                        <td th:text="${cliente.apellido2 ?: '-'}">apellido2</td>
+                        <td th:text="${cliente.ciudad}">ciudad</td>
+                        <td th:text="${cliente.categoria}">categoría</td>
+                        <td>
+                            <div class="actions">
+                                <form th:action="@{/clientes/{id}(id=${cliente.id})}">
+                                    <input type="submit" value="Ver detalle">
+                                </form>
+                                <form th:action="@{/clientes/editar/{id}(id=${cliente.id})}">
+                                    <input type="submit" value="Editar">
+                                </form>
+                                <form th:action="@{/clientes/borrar/{id}(id=${cliente.id})}" method="post" class="delete-button">
+                                    <input type="submit" value="Eliminar">
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>
