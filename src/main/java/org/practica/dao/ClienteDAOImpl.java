@@ -58,11 +58,13 @@ public class ClienteDAOImpl implements ClienteDAO {
 			ps.setString(idx++, cliente.getApellido1());
 			ps.setString(idx++, cliente.getApellido2());
 			ps.setString(idx++, cliente.getCiudad());
-			ps.setInt(idx, cliente.getCategoria());
+			ps.setObject(idx, cliente.getCategoria());
 			return ps;
 		},keyHolder);
 		
-		cliente.setId(keyHolder.getKey().intValue());
+		if (keyHolder.getKey() != null) {
+			cliente.setId(keyHolder.getKey().intValue());
+		}
 
 		log.info("Insertados {} registros.", rows);
 	}
@@ -73,20 +75,14 @@ public class ClienteDAOImpl implements ClienteDAO {
 	@Override
 	public List<Cliente> getAll() {
 		
-		List<Cliente> listFab = jdbcTemplate.query(
+		List<Cliente> clientes = jdbcTemplate.query(
                 "SELECT * FROM cliente",
-                (rs, rowNum) -> new Cliente(rs.getInt("id"),
-                						 	rs.getString("nombre"),
-                						 	rs.getString("apellido1"),
-                						 	rs.getString("apellido2"),
-                						 	rs.getString("ciudad"),
-                						 	rs.getInt("categoría")
-                						 	)
+                (rs, rowNum) -> mapCliente(rs)
         );
 		
-		log.info("Devueltos {} registros.", listFab.size());
+		log.info("Devueltos {} registros.", clientes.size());
 		
-        return listFab;
+        return clientes;
         
 	}
 
@@ -96,22 +92,11 @@ public class ClienteDAOImpl implements ClienteDAO {
 	@Override
 	public Optional<Cliente> find(int id) {
 		
-		Cliente fab =  jdbcTemplate
-				.queryForObject("SELECT * FROM cliente WHERE id = ?"														
-								, (rs, rowNum) -> new Cliente(rs.getInt("id"),
-            						 						rs.getString("nombre"),
-            						 						rs.getString("apellido1"),
-            						 						rs.getString("apellido2"),
-            						 						rs.getString("ciudad"),
-            						 						rs.getInt("categoría")) 
-								, id
-								);
-		
-		if (fab != null) { 
-			return Optional.of(fab);}
-		else { 
-			log.info("Cliente no encontrado.");
-			return Optional.empty(); }
+		List<Cliente> clientes = jdbcTemplate.query(
+				"SELECT * FROM cliente WHERE id = ?",
+				(rs, rowNum) -> mapCliente(rs),
+				id);
+		return clientes.stream().findFirst();
         
 	}
 	/**
@@ -148,7 +133,17 @@ public class ClienteDAOImpl implements ClienteDAO {
 		int rows = jdbcTemplate.update("DELETE FROM cliente WHERE id = ?", id);
 		
 		log.info("Delete de Cliente con {} registros eliminados.", rows);		
+	}
 		
+
+	private Cliente mapCliente(java.sql.ResultSet rs) throws java.sql.SQLException {
+		return new Cliente(
+				rs.getInt("id"),
+				rs.getString("nombre"),
+				rs.getString("apellido1"),
+				rs.getString("apellido2"),
+				rs.getString("ciudad"),
+				rs.getObject("categoría", Integer.class));
 	}
 	
 }
