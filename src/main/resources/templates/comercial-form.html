@@ -8,7 +8,7 @@
     <style>body { background: #f3f6f4; color: #23332d; } .navbar { background: #173d32; } .navbar-brand, .nav-link { color: #fff; } .nav-link:hover { color: #b6e2ca; } .page-title { color: #173d32; }</style>
 </head>
 <body>
-    <nav class="navbar navbar-expand navbar-dark"><div class="container"><a class="navbar-brand fw-semibold" th:href="@{/clientes}">Ventas</a><div class="navbar-nav"><a class="nav-link" th:href="@{/clientes}">Clientes</a><a class="nav-link" th:href="@{/comerciales}">Comerciales</a></div></div></nav>
+    <nav class="navbar navbar-expand navbar-dark"><div class="container"><a class="navbar-brand fw-semibold" th:href="@{/clientes}">Ventas</a><div class="navbar-nav"><a class="nav-link" th:href="@{/clientes}">Clientes</a><a class="nav-link" th:href="@{/comerciales}">Comerciales</a><a class="nav-link" th:href="@{/pedidos}">Pedidos</a></div></div></nav>
     <main class="container py-4 py-md-5"><div class="row justify-content-center"><div class="col-12 col-lg-9 col-xl-8">
         <div class="row align-items-end g-3 mb-4"><div class="col"><p class="text-uppercase text-secondary small fw-semibold mb-1">Comerciales</p><h1 class="page-title h2 mb-0" th:text="${modoEdicion} ? 'Editar comercial' : 'Nuevo comercial'"></h1></div><div class="col-auto" th:if="${modoEdicion}"><span class="badge text-bg-light border" th:text="'ID ' + ${comercial.id}"></span></div></div>
         <form class="bg-white border rounded-2 p-3 p-md-4" th:object="${comercial}" th:action="${modoEdicion} ? @{/comerciales/{id}(id=${comercial.id})} : @{/comerciales}" method="post">

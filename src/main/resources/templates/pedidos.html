@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pedidos | Ventas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f3f6f4; color: #23332d; }
+        .navbar { background: #173d32; }
+        .navbar-brand, .nav-link { color: #fff; }
+        .nav-link.active, .nav-link:hover { color: #b6e2ca; }
+        .page-title { color: #173d32; }
+        .table thead th { background: #e4eee7; color: #365447; white-space: nowrap; }
+        .table td { vertical-align: middle; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand navbar-dark">
+        <div class="container">
+            <a class="navbar-brand fw-semibold" th:href="@{/pedidos}">Ventas</a>
+            <div class="navbar-nav"><a class="nav-link" th:href="@{/clientes}">Clientes</a><a class="nav-link" th:href="@{/comerciales}">Comerciales</a><a class="nav-link active" aria-current="page" th:href="@{/pedidos}">Pedidos</a></div>
+        </div>
+    </nav>
+    <main class="container py-4 py-md-5">
+        <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert"><span th:text="${mensaje}"></span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button></div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert"><span th:text="${error}"></span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button></div>
+        <div class="row align-items-center g-3 mb-4">
+            <div class="col-12 col-md"><p class="text-uppercase text-secondary small fw-semibold mb-1">Base de datos de ventas</p><h1 class="page-title h2 mb-0">Pedidos</h1></div>
+            <div class="col-12 col-md-auto"><a class="btn btn-success" th:href="@{/pedidos/nuevo}">+ Nuevo pedido</a></div>
+        </div>
+        <div class="table-responsive bg-white border rounded-2">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>ID</th><th>Total</th><th>Fecha</th><th>Cliente</th><th>Comercial</th><th>Acciones</th></tr></thead>
+                <tbody>
+                    <tr th:each="pedido : ${listaPedidos}">
+                        <td th:text="${pedido.id}"></td>
+                        <td th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}"></td>
+                        <td th:text="${pedido.fecha ?: '-'}"></td>
+                        <td th:text="${nombresClientes[pedido.clienteId] ?: 'Cliente no disponible'}"></td>
+                        <td th:text="${nombresComerciales[pedido.comercialId] ?: 'Comercial no disponible'}"></td>
+                        <td><div class="d-flex flex-wrap gap-2"><a class="btn btn-sm btn-outline-secondary" th:href="@{/pedidos/{id}(id=${pedido.id})}">Ver</a><a class="btn btn-sm btn-outline-primary" th:href="@{/pedidos/editar/{id}(id=${pedido.id})}">Editar</a><form th:action="@{/pedidos/borrar/{id}(id=${pedido.id})}" method="post"><button class="btn btn-sm btn-outline-danger" type="submit">Eliminar</button></form></div></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(listaPedidos)}"><td colspan="6" class="text-center text-secondary py-4">No hay pedidos registrados.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
