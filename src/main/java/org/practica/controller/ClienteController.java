@@ -1,6 +1,7 @@
 package org.practica.controller;
 
 import java.util.List;
+import java.util.Comparator;
 
 import org.practica.demo.Cliente;
 import org.practica.service.ClienteService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
     
 @Controller 
@@ -25,10 +27,21 @@ public class ClienteController {
     
 
     @GetMapping("/clientes")
-    public String listar(Model model) {
-        
-        List<Cliente> listaClientes = clienteService.listAll();
+    public String listar(@RequestParam(required = false) String ciudad, Model model) {
+        List<Cliente> todosLosClientes = clienteService.listAll();
+        List<String> ciudades = todosLosClientes.stream()
+                .map(Cliente::getCiudad)
+                .filter(nombreCiudad -> nombreCiudad != null && !nombreCiudad.isBlank())
+                .distinct()
+                .sorted(Comparator.comparing(String::toLowerCase))
+                .toList();
+        List<Cliente> listaClientes = ciudad == null || ciudad.isBlank()
+                ? todosLosClientes
+                : clienteService.getByciudad(ciudad);
+
         model.addAttribute("listaClientes", listaClientes);
+        model.addAttribute("ciudades", ciudades);
+        model.addAttribute("ciudadSeleccionada", ciudad);
 
         return "clientes";
 

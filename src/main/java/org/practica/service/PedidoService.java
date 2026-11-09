@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.practica.dao.PedidoDAO;
 import org.practica.demo.Pedido;
+import org.practica.demo.PedidoDetalle;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,5 +35,9 @@ public class PedidoService {
 
 	public void delete(int id) {
 		pedidoDAO.delete(id);
+	}
+
+	public List<PedidoDetalle> findByComercialId(int comercialId) {
+		return pedidoDAO.findByComercialId(comercialId);
 	}
 }

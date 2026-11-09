@@ -21,6 +21,10 @@ public class ClienteService {
         return clienteDAO.getAll();
     }
 
+    public List<Cliente> getByciudad(String ciudad) {
+        return clienteDAO.getByciudad(ciudad);
+    }
+
     public java.util.Optional<Cliente> find(int id) {
         return clienteDAO.find(id);
     }

@@ -29,6 +29,17 @@
             <div class="col-12 col-md"><p class="text-uppercase text-secondary small fw-semibold mb-1">Base de datos de ventas</p><h1 class="page-title h2 mb-0">Clientes</h1></div>
             <div class="col-12 col-md-auto"><a class="btn btn-success" th:href="@{/clientes/nuevo}">+ Nuevo cliente</a></div>
         </div>
+        <form class="row g-2 align-items-end mb-3" method="get" th:action="@{/clientes}">
+            <div class="col-12 col-sm-6 col-md-4">
+                <label class="form-label" for="ciudad">Filtrar por ciudad</label>
+                <select class="form-select" id="ciudad" name="ciudad">
+                    <option value="" th:selected="${ciudadSeleccionada == null or ciudadSeleccionada.isBlank()}">Todas las ciudades</option>
+                    <option th:each="ciudad : ${ciudades}" th:value="${ciudad}" th:text="${ciudad}" th:selected="${ciudad == ciudadSeleccionada}"></option>
+                </select>
+            </div>
+            <div class="col-auto"><button class="btn btn-outline-success" type="submit">Filtrar</button></div>
+            <div class="col-auto"><a class="btn btn-outline-secondary" th:href="@{/clientes}">Limpiar</a></div>
+        </form>
         <div class="table-responsive bg-white border rounded-2">
             <table class="table table-hover mb-0">
                 <thead><tr><th>ID</th><th>Nombre</th><th>Apellido 1</th><th>Apellido 2</th><th>Ciudad</th><th>Categoría</th><th>Acciones</th></tr></thead>

@@ -5,12 +5,18 @@ import java.util.Optional;
 
 import org.practica.dao.ComercialDAO;
 import org.practica.demo.Comercial;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.practica.demo.PedidoDetalle;
 
 @Service
 public class ComercialService {
 
-	private final ComercialDAO comercialDAO;
+	@Autowired 
+	private  ComercialDAO comercialDAO;
+
+	@Autowired
+	private PedidoService pedidoDAO;
 
 	public ComercialService(ComercialDAO comercialDAO) {
 		this.comercialDAO = comercialDAO;
@@ -35,4 +41,9 @@ public class ComercialService {
 	public void delete(int id) {
 		comercialDAO.delete(id);
 	}
+
+	public List<PedidoDetalle> findPedidosByComercial(int comercialId) {
+		return pedidoDAO.findByComercialId(comercialId);
+	}
+
 }
