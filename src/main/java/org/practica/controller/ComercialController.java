@@ -2,6 +2,7 @@ package org.practica.controller;
 
 import org.practica.demo.Comercial;
 import org.practica.service.ComercialService;
+import org.practica.service.PedidoService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,9 +16,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ComercialController {
 
 	private final ComercialService comercialService;
+	private final PedidoService pedidoService;
 
-	public ComercialController(ComercialService comercialService) {
+	public ComercialController(ComercialService comercialService, PedidoService pedidoService) {
 		this.comercialService = comercialService;
+		this.pedidoService = pedidoService;
 	}
 
 	@GetMapping("/comerciales")
@@ -68,6 +71,7 @@ public class ComercialController {
 		return comercialService.find(id)
 				.map(comercial -> {
 					model.addAttribute("comercial", comercial);
+					model.addAttribute("listaPedidos", pedidoService.findByComercialId(id));
 					return "comercial-detalle";
 				})
 				.orElseGet(() -> {

@@ -14,6 +14,24 @@
         <dl class="row bg-white border rounded-2 p-3 p-md-4 g-3 mb-4">
             <dt class="col-5 col-md-4">ID</dt><dd class="col-7 col-md-8" th:text="${comercial.id}"></dd><dt class="col-5 col-md-4">Nombre</dt><dd class="col-7 col-md-8" th:text="${comercial.nombre}"></dd><dt class="col-5 col-md-4">Primer apellido</dt><dd class="col-7 col-md-8" th:text="${comercial.apellido1}"></dd><dt class="col-5 col-md-4">Segundo apellido</dt><dd class="col-7 col-md-8" th:text="${comercial.apellido2 ?: '-'}"></dd><dt class="col-5 col-md-4">Comisión</dt><dd class="col-7 col-md-8" th:text="${#numbers.formatDecimal(comercial.comision, 1, 2)}"></dd>
         </dl>
+        <section class="mb-4">
+            <h2 class="h4 page-title mb-3">Pedidos del comercial</h2>
+            <div class="table-responsive bg-white border rounded-2">
+                <table class="table table-hover mb-0">
+                    <thead><tr><th>ID</th><th>Total</th><th>Fecha</th><th>Cliente</th><th>Acción</th></tr></thead>
+                    <tbody>
+                        <tr th:each="pedido : ${listaPedidos}">
+                            <td th:text="${pedido.id}"></td>
+                            <td th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}"></td>
+                            <td th:text="${pedido.fecha ?: '-'}"></td>
+                            <td th:text="${pedido.clienteNombre}"></td>
+                            <td><a class="btn btn-sm btn-outline-secondary" th:href="@{/pedidos/{id}(id=${pedido.id})}">Ver pedido</a></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(listaPedidos)}"><td colspan="5" class="text-center text-secondary py-4">Este comercial no tiene pedidos.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
         <div class="d-flex flex-wrap justify-content-end gap-2"><a class="btn btn-outline-secondary" th:href="@{/comerciales}">Volver</a><a class="btn btn-primary" th:href="@{/comerciales/editar/{id}(id=${comercial.id})}">Editar comercial</a></div>
     </div></div></main>
 </body>

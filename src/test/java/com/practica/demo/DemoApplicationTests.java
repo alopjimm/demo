@@ -142,6 +142,27 @@ class DemoApplicationTests {
 
 	@Test
 	@Transactional
+	void salespersonDetailShowsOnlyTheirOrders() throws Exception {
+		Cliente cliente = crearCliente("Ana", "Lopez", null);
+		Comercial comercial = crearComercial("Carlos", "Vega", null);
+		Comercial otroComercial = crearComercial("Marta", "Rios", null);
+		Pedido pedido = new Pedido(0, new BigDecimal("125.50"), LocalDate.of(2024, 6, 15),
+				cliente.getId(), comercial.getId());
+		pedidoService.create(pedido);
+		Pedido pedidoAjeno = new Pedido(0, new BigDecimal("80.00"), LocalDate.of(2024, 6, 16),
+				cliente.getId(), otroComercial.getId());
+		pedidoService.create(pedidoAjeno);
+
+		mockMvc.perform(get("/comerciales/{id}", comercial.getId()))
+				.andExpect(status().isOk())
+				.andExpect(view().name("comercial-detalle"))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("125.50")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("Ana Lopez")))
+				.andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("80.00"))));
+	}
+
+	@Test
+	@Transactional
 	void rejectsOrdersWithUnknownCustomerOrSalespersonIds() throws Exception {
 		Cliente cliente = crearCliente("Valido", "Cliente", null);
 		Comercial comercial = crearComercial("Valido", "Comercial", null);
