@@ -70,8 +70,11 @@ public class ComercialController {
 	public String detalle(@PathVariable int id, Model model, RedirectAttributes redirectAttributes) {
 		return comercialService.find(id)
 				.map(comercial -> {
+					var pedidos = pedidoService.findByComercialId(id);
 					model.addAttribute("comercial", comercial);
-					model.addAttribute("listaPedidos", pedidoService.findByComercialId(id));
+					model.addAttribute("listaPedidos", pedidos);
+					model.addAttribute("estadisticasPedidos", pedidoService.calcularEstadisticas(pedidos));
+					model.addAttribute("clientesPorTotalPedidos", pedidoService.resumirClientesPorTotal(pedidos));
 					return "comercial-detalle";
 				})
 				.orElseGet(() -> {

@@ -2,6 +2,7 @@ package com.practica.demo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -10,6 +11,8 @@ import org.practica.demo.Cliente;
 import org.practica.demo.Comercial;
 import org.practica.demo.DemoApplication;
 import org.practica.demo.Pedido;
+import org.practica.dto.ClienteTotalPedidosDTO;
+import org.practica.dto.PedidoEstadisticasDTO;
 import org.practica.service.ClienteService;
 import org.practica.service.ComercialService;
 import org.practica.service.PedidoService;
@@ -144,11 +147,19 @@ class DemoApplicationTests {
 	@Transactional
 	void salespersonDetailShowsOnlyTheirOrders() throws Exception {
 		Cliente cliente = crearCliente("Ana", "Lopez", null);
+		Cliente segundoCliente = crearCliente("Sofia", "Mendez", null);
 		Comercial comercial = crearComercial("Carlos", "Vega", null);
 		Comercial otroComercial = crearComercial("Marta", "Rios", null);
 		Pedido pedido = new Pedido(0, new BigDecimal("125.50"), LocalDate.of(2024, 6, 15),
 				cliente.getId(), comercial.getId());
 		pedidoService.create(pedido);
+		Pedido segundoPedido = new Pedido(0, new BigDecimal("74.50"), LocalDate.of(2024, 6, 17),
+				cliente.getId(), comercial.getId());
+		pedidoService.create(segundoPedido);
+		pedidoService.create(new Pedido(0, new BigDecimal("125.00"), LocalDate.of(2024, 6, 18),
+				segundoCliente.getId(), comercial.getId()));
+		pedidoService.create(new Pedido(0, new BigDecimal("125.00"), LocalDate.of(2024, 6, 19),
+				segundoCliente.getId(), comercial.getId()));
 		Pedido pedidoAjeno = new Pedido(0, new BigDecimal("80.00"), LocalDate.of(2024, 6, 16),
 				cliente.getId(), otroComercial.getId());
 		pedidoService.create(pedidoAjeno);
@@ -156,7 +167,21 @@ class DemoApplicationTests {
 		mockMvc.perform(get("/comerciales/{id}", comercial.getId()))
 				.andExpect(status().isOk())
 				.andExpect(view().name("comercial-detalle"))
+				.andExpect(model().attribute("estadisticasPedidos",
+						new PedidoEstadisticasDTO(4, new BigDecimal("450.00"), new BigDecimal("112.50"),
+								new BigDecimal("125.50"), new BigDecimal("74.50"))))
+				.andExpect(model().attribute("clientesPorTotalPedidos", List.of(
+						new ClienteTotalPedidosDTO(segundoCliente.getId(), "Sofia Mendez", new BigDecimal("250.00")),
+						new ClienteTotalPedidosDTO(cliente.getId(), "Ana Lopez", new BigDecimal("200.00")))))
 				.andExpect(content().string(org.hamcrest.Matchers.containsString("125.50")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("200.00")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("Clientes por total de pedidos")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("250.00")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("112.50")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("pedido-maximo")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("pedido-minimo")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("Pedido de importe máximo")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("Pedido de importe mínimo")))
 				.andExpect(content().string(org.hamcrest.Matchers.containsString("Ana Lopez")))
 				.andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("80.00"))));
 	}
