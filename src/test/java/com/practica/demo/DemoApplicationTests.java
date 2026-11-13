@@ -82,6 +82,21 @@ class DemoApplicationTests {
 
 	@Test
 	@Transactional
+	void rendersCustomerEditFormWithLinkedSalespeople() throws Exception {
+		Cliente cliente = crearCliente("Eva", "Prueba", null);
+		Comercial comercial = crearComercial("Luis", "Ventas", null);
+		clienteService.addComercial(cliente.getId(), comercial.getId(), LocalDate.of(2024, 6, 15), 1);
+
+		mockMvc.perform(get("/clientes/editar/{id}", cliente.getId()))
+				.andExpect(status().isOk())
+				.andExpect(view().name("cliente-form"))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("Añadir Comercial")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("Luis Ventas")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("15/06/2024")));
+	}
+
+	@Test
+	@Transactional
 	void createsEditsAndRendersOrdersWithFullNamesAndSelectedReferences() throws Exception {
 		Cliente cliente = crearCliente("Lucia", "SinSegundo", null);
 		Comercial comercial = crearComercial("Carlos", "SinSegundo", null);

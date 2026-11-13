@@ -2,10 +2,12 @@ package org.practica.dao;
 
 
 import java.sql.PreparedStatement;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import org.practica.demo.Cliente;
+import org.practica.dto.ClienteComercialDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -130,6 +132,39 @@ public class ClienteDAOImpl implements ClienteDAO {
 		
 		log.info("Update de Cliente con {} registros actualizados.", rows);
     
+	}
+
+	@Override
+	public void addComercial(int clienteId, int comercialId, LocalDate fecha, int prioridad) {
+		jdbcTemplate.update("""
+				INSERT INTO cliente_has_comercial (cliente_id, comercial_id, fecha, prioridad)
+				VALUES (?, ?, ?, ?)
+				""", clienteId, comercialId, fecha, prioridad);
+	}
+
+	@Override
+	public List<ClienteComercialDTO> getComercialesByClienteId(int clienteId) {
+		return jdbcTemplate.query("""
+				SELECT co.id, CONCAT_WS(' ', co.nombre, co.apellido1, co.apellido2) AS nombre_completo,
+				       chc.fecha, chc.prioridad
+				FROM cliente_has_comercial chc
+				JOIN comercial co ON co.id = chc.comercial_id
+				WHERE chc.cliente_id = ?
+				ORDER BY chc.prioridad, co.apellido1, co.nombre
+				""", (rs, rowNum) -> new ClienteComercialDTO(
+					rs.getInt("id"),
+					rs.getString("nombre_completo"),
+					rs.getDate("fecha") == null ? null : rs.getDate("fecha").toLocalDate(),
+					rs.getInt("prioridad")),
+				clienteId);
+	}
+
+	@Override
+	public void removeComercial(int clienteId, int comercialId) {
+		jdbcTemplate.update("""
+				DELETE FROM cliente_has_comercial
+				WHERE cliente_id = ? AND comercial_id = ?
+				""", clienteId, comercialId);
 	}
 
 	/**

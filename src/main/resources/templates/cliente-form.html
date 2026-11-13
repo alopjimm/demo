@@ -21,6 +21,53 @@
                 <div class="col-12 d-flex flex-wrap justify-content-end gap-2 pt-2"><a class="btn btn-outline-secondary" th:href="@{/clientes}">Cancelar</a><button class="btn btn-success" type="submit" th:text="${modoEdicion} ? 'Guardar cambios' : 'Crear cliente'"></button></div>
             </div>
         </form>
+        <section class="mt-4" th:if="${modoEdicion}">
+            <h2 class="h5 page-title mb-3">Añadir comercial al cliente</h2>
+            <div class="alert alert-success" th:if="${mensajeComercial}" th:text="${mensajeComercial}"></div>
+            <div class="alert alert-danger" th:if="${errorComercial}" th:text="${errorComercial}"></div>
+            <form class="bg-white border rounded-2 p-3 p-md-4" th:action="@{/clientes/{id}/comerciales(id=${cliente.id})}" method="post">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="comercialId">Comercial</label>
+                        <select class="form-select" id="comercialId" name="comercialId" required>
+                            <option value="" selected disabled>Selecciona un comercial</option>
+                            <option th:each="comercial : ${listaComerciales}" th:value="${comercial.id}"
+                                    th:text="${comercial.nombre + ' ' + comercial.apellido1 + (comercial.apellido2 != null ? ' ' + comercial.apellido2 : '')}"></option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label" for="fecha">Fecha</label>
+                        <input class="form-control" id="fecha" name="fecha" type="date" required>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label" for="prioridad">Prioridad</label>
+                        <input class="form-control" id="prioridad" name="prioridad" type="number" min="1" step="1" required>
+                    </div>
+                    <div class="col-12 d-flex justify-content-end">
+                        <button class="btn btn-success" type="submit">Añadir Comercial</button>
+                    </div>
+                </div>
+            </form>
+            <h2 class="h5 page-title mt-4 mb-3">Comerciales vinculados</h2>
+            <div class="table-responsive bg-white border rounded-2" th:if="${!#lists.isEmpty(comercialesVinculados)}">
+                <table class="table table-striped mb-0">
+                    <thead><tr><th scope="col">Comercial</th><th scope="col">Fecha</th><th scope="col">Prioridad</th><th scope="col">Acciones</th></tr></thead>
+                    <tbody>
+                        <tr th:each="vinculo : ${comercialesVinculados}">
+                            <td th:text="${vinculo.nombreCompleto}"></td>
+                            <td th:text="${vinculo.fecha != null ? #temporals.format(vinculo.fecha, 'dd/MM/yyyy') : 'Sin fecha'}"></td>
+                            <td th:text="${vinculo.prioridad}"></td>
+                            <td>
+                                <form th:action="@{/clientes/{id}/comerciales/{comercialId}/borrar(id=${cliente.id}, comercialId=${vinculo.comercialId})}" method="post">
+                                    <button class="btn btn-outline-danger btn-sm" type="submit">Borrar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-secondary mb-0" th:if="${#lists.isEmpty(comercialesVinculados)}">Este cliente todavía no tiene comerciales vinculados.</p>
+        </section>
     </div></div></main>
 </body>
 </html>
